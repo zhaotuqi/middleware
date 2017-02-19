@@ -1,0 +1,22 @@
+{
+  "name": "library/middleware",
+  "description": "公共中间件",
+  "keywords": ["common","middleware","laravel5"],
+  "authors": [
+    {
+      "name": "baojie.shao",
+      "email": "baojie.shao@wenba100.com"
+    }
+  ],
+  "license": "MIT",
+  "require": {
+    "php": ">=5.4.0",
+    "monolog/monolog": "~1.11",
+    "library/common":"dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  }
+}
