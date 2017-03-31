@@ -9,6 +9,7 @@ use Monolog\Logger;
 
 class IOLog
 {
+    static protected $startTime;
     /**
      * Handle an incoming request.
      *
@@ -18,12 +19,16 @@ class IOLog
      */
     public function handle($request, Closure $next)
     {
+        if (!self::$startTime) {
+            self::$startTime = microtime(true);
+        }
         return $next($request);
     }
 
     public function terminate($request, $response)
     {
         $message = [
+            'response_time'  => microtime(true) - self::$startTime,
             'request_uri'    => $request->getPathInfo(),
             'request_header' => $request->headers->get('Content-Type'),
             'request_body'   => $request->all(),
