@@ -30,7 +30,7 @@ class IOLog
         $message = [
             'response_time'  => microtime(true) - self::$startTime,
             'request_uri'    => $request->getPathInfo(),
-            'request_header' => $request->headers->get('Content-Type'),
+            'request_header' => $request->headers->all(),
             'request_body'   => $request->all(),
             'response_body'  => @json_decode($response->getContent(), true) ?: $response->getContent()
         ];
