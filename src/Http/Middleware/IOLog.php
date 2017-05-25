@@ -29,7 +29,6 @@ class IOLog
     public function terminate($request, $response)
     {
         $common = app('Common');
-        if ($this->blackList($request->getPathInfo())) return true;
         $message = [
             'response_time'  => microtime(true) - self::$startTime,
             'request_uri'    => $request->getPathInfo(),
