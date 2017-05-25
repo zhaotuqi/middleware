@@ -9,6 +9,7 @@ use Monolog\Logger;
 class IOLog
 {
     static protected $startTime;
+
     /**
      * Handle an incoming request.
      *
@@ -21,12 +22,14 @@ class IOLog
         if (!self::$startTime) {
             self::$startTime = microtime(true);
         }
+
         return $next($request);
     }
 
     public function terminate($request, $response)
     {
         $common = app('Common');
+        if ($this->blackList($request->getPathInfo())) return true;
         $message = [
             'response_time'  => microtime(true) - self::$startTime,
             'request_uri'    => $request->getPathInfo(),
@@ -37,11 +40,10 @@ class IOLog
 
         $common->logger(config('app.app_name'),
             'requestlog.log',
-            json_encode($message, JSON_UNESCAPED_UNICODE),
+            $message,
             Logger::INFO
         );
 
     }
-
 
 }
