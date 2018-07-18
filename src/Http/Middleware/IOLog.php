@@ -36,18 +36,21 @@ class IOLog
     {
     	/** @var \App\Libraries\Common $common */
         $common = app('Common');
-        
-	    $falcon_message = [
-		    'response_time'  => microtime(true) - self::$startTime,
-		    'request_uri'    => $request->getPathInfo(),
-		    'status_code'    => $response->getStatusCode(),
-		    'server_name'    => config('app.app_name'),
-	    ];
 
-	    try {
-		    $url = env('FALCON_API', 'http://10.10.32.180/falcon_agent');
-		    $common->request($url, $falcon_message);
-	    } catch (\Exception $e) {
+        // 生产环境上报接口状态
+	    if (app()->environment() == 'production' || app()->environment() == 'pro') {
+		    $falcon_message = [
+			    'response_time' => microtime(true) - self::$startTime,
+			    'request_uri'   => $request->getPathInfo(),
+			    'status_code'   => $response->getStatusCode(),
+			    'server_name'   => config('app.app_name'),
+		    ];
+
+		    try {
+			    $url = env('FALCON_API', 'http://10.10.32.180/falcon_agent');
+			    $common->request($url, $falcon_message);
+		    } catch (\Exception $e) {
+		    }
 	    }
 	    
         $message = [
