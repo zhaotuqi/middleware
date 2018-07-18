@@ -26,9 +26,30 @@ class IOLog
         return $next($request);
     }
 
+	/**
+	 * 请求日志 & 上报接口状态
+	 *
+	 * @param \Illuminate\Http\Request $request
+	 * @param \Illuminate\Http\Response $response 
+	 */
     public function terminate($request, $response)
     {
+    	/** @var \App\Libraries\Common $common */
         $common = app('Common');
+        
+	    $falcon_message = [
+		    'response_time'  => microtime(true) - self::$startTime,
+		    'request_uri'    => $request->getPathInfo(),
+		    'status_code'    => $response->getStatusCode(),
+		    'server_name'    => config('app.app_name'),
+	    ];
+
+	    try {
+		    $url = env('FALCON_API', 'http://10.10.32.180/falcon_agent');
+		    $common->request($url, $falcon_message);
+	    } catch (\Exception $e) {
+	    }
+	    
         $message = [
             'response_time'  => microtime(true) - self::$startTime,
             'request_uri'    => $request->getPathInfo(),
@@ -42,7 +63,7 @@ class IOLog
             $message,
             Logger::INFO
         );
-
+        
     }
 
 }
