@@ -36,25 +36,10 @@ class IOLog
     {
     	/** @var \App\Libraries\Common $common */
         $common = app('Common');
+        $cost_time = microtime(true) - self::$startTime;
 
-        // 生产环境上报接口状态
-	    if (app()->environment() == 'production' || app()->environment() == 'pro') {
-		    $falcon_message = [
-			    'response_time' => microtime(true) - self::$startTime,
-			    'request_uri'   => $request->getPathInfo(),
-			    'status_code'   => $response->getStatusCode(),
-			    'server_name'   => config('app.app_name'),
-		    ];
-
-		    try {
-			    $url = env('FALCON_API', 'http://10.10.32.180/falcon_agent');
-			    $common->request($url, $falcon_message);
-		    } catch (\Exception $e) {
-		    }
-	    }
-	    
         $message = [
-            'response_time'  => microtime(true) - self::$startTime,
+            'response_time'  => $cost_time,
             'request_uri'    => $request->getPathInfo(),
             'request_header' => $request->headers->all(),
             'request_body'   => $common->logReduce($request->all()),
@@ -66,7 +51,24 @@ class IOLog
             $message,
             Logger::INFO
         );
-        
+
+	    // 生产环境上报接口状态
+	    if (app()->environment() == 'production' || app()->environment() == 'pro') {
+		    $url = env("FALCON_AGENT");
+		    if ( ! empty($url)) {
+			    $falcon_message = [
+				    'response_time' => $cost_time,
+				    'request_uri'   => $request->getPathInfo(),
+				    'status_code'   => $response->getStatusCode(),
+				    'server_name'   => config('app.app_name'),
+			    ];
+
+			    try {
+				    $common->request($url, $falcon_message);
+			    } catch (\Exception $e) {
+			    }
+		    }
+	    }
     }
 
 }
