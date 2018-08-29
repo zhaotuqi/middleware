@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Log;
 use Monolog\Logger;
+use Monitor;
 
 class IOLog
 {
