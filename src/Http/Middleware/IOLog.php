@@ -54,20 +54,14 @@ class IOLog
 
 	    // 生产环境上报接口状态
 	    if (app()->environment() == 'production' || app()->environment() == 'pro') {
-		    $url = env("FALCON_AGENT");
-		    if ( ! empty($url)) {
-			    $falcon_message = [
-				    'response_time' => $cost_time,
-				    'request_uri'   => $request->getPathInfo(),
-				    'status_code'   => $response->getStatusCode(),
-				    'server_name'   => config('app.app_name'),
-			    ];
-
-			    try {
-				    $common->request($url, $falcon_message);
-			    } catch (\Exception $e) {
-			    }
-		    }
+		    if (env("FALCON")) {
+		        try {
+                    Monitor\Client::inc($request->getPathInfo() . "qpm");
+                    Monitor\Client::cost($request->getPathInfo() . "cost", $cost_time * 1000); // 耗时是以毫秒计算
+                } catch (Exception $e) {
+                    Log::info('记录失败' . $e->getMessage());
+                }
+            }
 	    }
     }
 
