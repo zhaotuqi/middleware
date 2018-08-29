@@ -55,7 +55,7 @@ class IOLog
 
 	    // 生产环境上报接口状态
 	    if (app()->environment() == 'production' || app()->environment() == 'pro') {
-		    if (env("FALCON")) {
+		    if (env("FALCON") && class_exists('Monitor')) {
 		        try {
                     Monitor\Client::inc($request->getPathInfo() . "_qpm");
                     Monitor\Client::cost($request->getPathInfo() . "_cost", $cost_time * 1000); // 耗时是以毫秒计算
