@@ -37,6 +37,9 @@ class IOLog
     {
     	/** @var \App\Libraries\Common $common */
         $common = app('Common');
+        if (!self::$startTime) {
+            return;
+        }
         $cost_time = microtime(true) - self::$startTime;
 
         $message = [
