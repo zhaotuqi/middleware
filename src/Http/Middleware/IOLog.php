@@ -60,8 +60,8 @@ class IOLog
 	    if (app()->environment() == 'production' || app()->environment() == 'pro') {
 		    if (env("FALCON") && class_exists('Monitor\Client')) {
 		        try {
-                    Monitor\Client::inc($request->getPathInfo() . "_qpm");
-                    Monitor\Client::cost($request->getPathInfo() . "_cost", $cost_time * 1000); // 耗时是以毫秒计算
+                    Monitor\Client::inc($request->getPathInfo() . ",t=qpm");
+                    Monitor\Client::cost($request->getPathInfo() . ",t=cost", $cost_time * 1000); // 耗时是以毫秒计算
                 } catch (Exception $e) {
                     Log::info('记录失败' . $e->getMessage());
                 }
